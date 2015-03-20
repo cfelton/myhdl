@@ -9,6 +9,12 @@ Conversion examples
 
 .. _conv-usage-intro:
 
+.. testsetup:: *
+  
+    from __future__ import print_function
+    import os
+    from myhdl import *
+
 Introduction
 ============
 
@@ -21,9 +27,11 @@ read the companion chapter :ref:`conv`.
 A small sequential design
 =========================
 
-Consider the following MyHDL code for an incrementer module::
 
-    ACTIVE_LOW, INACTIVE_HIGH = 0, 1
+Consider the following MyHDL code for an incrementer module:
+
+
+.. testcode:: ex1
 
     def Inc(count, enable, clock, reset):
         
@@ -33,7 +41,6 @@ Consider the following MyHDL code for an incrementer module::
         enable -- control input, increment when 1
         clock -- clock input
         reset -- asynchronous reset input
-        n -- counter max value
         
         """
         
@@ -45,7 +52,9 @@ Consider the following MyHDL code for an incrementer module::
         return incLogic
 
 
-Normally, to simulate the design, we would elaborate it as follows::
+Normally, to simulate the design, we would elaborate it as follows:
+
+.. testcode:: ex1
 
     m = 8
 
@@ -56,14 +65,31 @@ Normally, to simulate the design, we would elaborate it as follows::
 
     inc_inst = Inc(count, enable, clock, reset)
 
+
 ``inc_inst`` is an elaborated design instance that can be simulated. To convert
-it to Verilog, we change the last line as follows::
+it to Verilog, we change the last line as follows:
 
-   inc_inst = toVerilog(Inc, count, enable, clock, reset, n=n)
+.. testcode:: ex1
 
+   inc_inst = toVerilog(Inc, count, enable, clock, reset)
+   print(os.path.isfile('Inc.v'))
+
+
+.. testoutput:: ex1
+   :hide:
+	
+   ** ToVerilogWarning: Output port is read internally: count
+   True
+
+.. .. testcleanup:: ex1
+.. 
+..    os.remove('Inc.v')
+   
 Again, this creates an instance that can be simulated, but as a side effect, it
 also generates an equivalent Verilog module in file :file:`Inc.v`. The Verilog
 code looks as follows::
+
+.. testcode:: ex2
 
     module Inc (
         count,
@@ -97,7 +123,15 @@ the MyHDL generator to a Verilog always block.
 
 Similarly, we can convert to VHDL as follows::
 
+.. testcode:: ex2
     inc_inst = toVHDL(Inc, count, enable, clock, reset, n=n)
+    print(os.path.isfile('Inc.vhd'))
+
+.. testoutput:: ex2
+   :hide:
+
+   ** ToVHDLWarning: Output port is read internally: count
+   True	
 
 This creates an equivalent VHDL module in file :file:`Inc.vhd`::
 
