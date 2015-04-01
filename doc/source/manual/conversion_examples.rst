@@ -28,10 +28,13 @@ A small sequential design
 =========================
 
 
-Consider the following MyHDL code for an incrementer module:
+Consider the following MyHDL code for an incrementer module, 
+the instantiation of the incrementer, and finally the conversion
+call.
 
 
-.. testcode:: ex1
+
+.. testcode:: ex0
 
     def Inc(count, enable, clock, reset):
         
@@ -56,6 +59,26 @@ Normally, to simulate the design, we would elaborate it as follows:
 
 .. testcode:: ex1
 
+    def Inc(count, enable, clock, reset):
+        
+        """ Incrementer with enable.
+        
+        count -- output
+        enable -- control input, increment when 1
+        clock -- clock input
+        reset -- asynchronous reset input
+        
+        """
+        
+        @always_seq(clock.posedge, reset=reset)
+        def incLogic():
+            if enable:
+                count.next = count + 1
+
+        return incLogic
+
+
+    # elaborate the design for simulation
     m = 8
 
     count = Signal(modbv(0)[m:])
@@ -65,14 +88,9 @@ Normally, to simulate the design, we would elaborate it as follows:
 
     inc_inst = Inc(count, enable, clock, reset)
 
-
-``inc_inst`` is an elaborated design instance that can be simulated. To convert
-it to Verilog, we change the last line as follows:
-
-.. testcode:: ex1
-
-   inc_inst = toVerilog(Inc, count, enable, clock, reset)
-   print(os.path.isfile('Inc.v'))
+    # convert the code to Verilog
+    inc_inst = toVerilog(Inc, count, enable, clock, reset)
+    print(os.path.isfile('Inc.v'))
 
 
 .. testoutput:: ex1
@@ -81,15 +99,20 @@ it to Verilog, we change the last line as follows:
    ** ToVerilogWarning: Output port is read internally: count
    True
 
-.. .. testcleanup:: ex1
-.. 
-..    os.remove('Inc.v')
+.. testcleanup:: ex1
+
+   os.remove('Inc.v')
+
+
+``inc_inst`` is an elaborated design instance that can be simulated. To convert
+it to Verilog, we change the last line as follows:
+
+
    
 Again, this creates an instance that can be simulated, but as a side effect, it
 also generates an equivalent Verilog module in file :file:`Inc.v`. The Verilog
 code looks as follows::
 
-.. testcode:: ex2
 
     module Inc (
         count,
@@ -791,7 +814,7 @@ follows::
 
        @always_comb
        def read():
-           dout.next = CONTENT[int(addr)]
+           dout.next = CONTENT[addr]
 
        return read
 
