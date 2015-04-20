@@ -27,12 +27,9 @@ read the companion chapter :ref:`conv`.
 A small sequential design
 =========================
 
-
 Consider the following MyHDL code for an incrementer module, 
 the instantiation of the incrementer, and finally the conversion
 call.
-
-
 
 .. testcode:: ex0
 
@@ -106,7 +103,6 @@ Normally, to simulate the design, we would elaborate it as follows:
 
 ``inc_inst`` is an elaborated design instance that can be simulated. To convert
 it to Verilog, we change the last line as follows:
-
 
    
 Again, this creates an instance that can be simulated, but as a side effect, it
